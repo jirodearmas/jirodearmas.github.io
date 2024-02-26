@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    font-family: $robotoMono;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 300;
+    color: $textColor;
+    background: radial-gradient(circle, rgba(2,8,33,1) 0%, rgba(0,0,0,1) 100%);
+}
+
+img {
+    max-width: 100%;
+    height: auto;;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+ul {
+    list-style: none;
+
+    &.list-disc {
+        list-style: disc;
+    }
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-weight: 500;
+}
+
+.container {
+    max-width: $container;
+    margin: 0 auto;
+    padding-left: 15px;
+    padding-right: 15px;;
+}
+
+section {
+
+    a {
+        text-decoration: underline;
+    }
+}
+
+.py-5 {
+    @include py(5rem);
+}
+
+.pt-5 {
+    @include pt(5rem);
+}
+
+.pb-3 {
+    @include pb(3rem);
+}
+
+/* Intro section */
+.jiro-card {
+    display: flex;
+    flex-direction: column;
+    @include py(2rem);
+
+    &__image {
+        border-radius: 50%;
+        margin-right: 2rem;
+    }
+
+    &__name {
+        font-size: 2.25rem;
+        margin: 0;
+    }
+
+    &__title {
+        font-size: 0.9rem;
+        font-weight: 300;
+        margin: 0;
+    }
+}
+
+/* Works section */
+.works {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    &__sample {
+        max-width: calc(50% - 5px);
+        margin-bottom: 10px;
+    }
+
+    &__desc {
+        font-size: 0.7rem;
+        margin: 0;
+    }
+}

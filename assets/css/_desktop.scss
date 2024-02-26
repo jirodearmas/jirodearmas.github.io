@@ -1,0 +1,25 @@
+@media only screen and (min-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    .works {
+        &__desc {
+            font-size: 0.8rem;
+        }
+    }
+
+    .jiro-card {
+        flex-direction: row;
+        align-items: center;
+        @include py(5rem);
+
+        &__name {
+            font-size: 3rem;
+        }
+    
+        &__title {
+            font-size: 1.25rem;
+        }
+    }
+}

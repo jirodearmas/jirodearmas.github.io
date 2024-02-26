@@ -1,0 +1,12 @@
+@mixin py($size) {
+    padding-top: $size;
+    padding-bottom: $size;
+}
+
+@mixin pt($size) {
+    padding-top: $size;
+}
+
+@mixin pb($size) {
+    padding-bottom: $size;
+}
