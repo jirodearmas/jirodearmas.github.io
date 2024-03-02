@@ -1,0 +1,39 @@
+.footer {
+    padding: 2rem 0;
+    background-color: var(--green);
+    font-family: "Marcellus", serif;
+
+    &__text {
+        flex-direction: column;
+        text-align: center;
+        justify-content: space-between;
+    }
+
+    p {
+        font-size: 14px;
+        color: var(--white);
+        margin: 0;
+
+        a {
+            color: var(--white);
+            text-decoration: underline;
+        }
+    }
+
+    .jiro-link {
+        margin-top: 3rem;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .footer {
+    
+        &__text {
+            flex-direction: row;
+        }
+
+        .jiro-link {
+            margin-top: 0;
+        }
+    }
+}
