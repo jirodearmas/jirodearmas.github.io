@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Disallow:https://jirodev.com/cv.pdf
