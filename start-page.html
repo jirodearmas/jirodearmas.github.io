@@ -136,16 +136,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </body>
     <script>
-const { createClient } = require('pexels-javascript-master');
+// const { createClient } = require('pexels-javascript-master');
 
-const client = createClient('qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih');
-const query = 'Nature';
+// const client = createClient('qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih');
+// const query = 'Nature';
 
-client.photos.search({ query, per_page: 1 });
-// .then(photos => {...})
-console.log(client);
+// client.photos.search({ query, per_page: 1 });
+// // .then(photos => {...})
+// console.log(client);
+
+        let images = [];
+const res = await fetch(
+  "https://api.pexels.com/v1/search?query="+Nature+"&orientation=landscape&size=large&per_page=1",
+  {
+    headers: { 'Authorization': inputData.qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih }
+  }).then(res => res.json())
+  .then(json => {
+    images = json['photos']
+  });
+
+return { link: images[Math.floor(Math.random() * images.length)]['src']['large'] };
 </script>
 </html>
+
 
 
 
