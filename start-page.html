@@ -147,7 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         let images = [];
 const res = fetch(
-  "https://api.pexels.com/v1/search?query="+Nature+"&orientation=landscape&size=large&per_page=1",
+  "https://api.pexels.com/v1/search?query=Nature&orientation=landscape&size=large&per_page=1",
   {
     headers: { 'Authorization': inputData.qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih }
   }).then(res => res.json())
@@ -158,6 +158,7 @@ console.log(images);
 // return { link: images[Math.floor(Math.random() * images.length)]['src']['large'] };
 </script>
 </html>
+
 
 
 
