@@ -153,11 +153,13 @@ const res = fetch(
   }).then(res => res.json())
   .then(json => {
     images = json['photos']
+      console.log(images);
   });
-console.log(images);
+// console.log(images);
 // return { link: images[Math.floor(Math.random() * images.length)]['src']['large'] };
 </script>
 </html>
+
 
 
 
