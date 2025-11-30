@@ -10,8 +10,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 body {
-    background: rgb(255,255,255);
-    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(224,232,248,1) 69%);
+    background: rgba(255, 255, 255, 0.15); /* Semi-transparent white background */
+    backdrop-filter: blur(2px) saturate(180%); /* Blur and saturate background content */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle white border */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
     color: #fff;
     display: flex;
     font-family: "Poppins", serif;
