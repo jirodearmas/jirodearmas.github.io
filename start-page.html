@@ -136,7 +136,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </body>
     <script>
-import { createClient } from 'pexels';
+import { createClient } from 'node_modules/pexels';
 
 const client = createClient('qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih');
 const query = 'Nature';
@@ -146,5 +146,6 @@ client.photos.search({ query, per_page: 1 });
 console.log(client);
 </script>
 </html>
+
 
 
