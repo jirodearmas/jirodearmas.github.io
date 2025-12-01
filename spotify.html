@@ -92,7 +92,8 @@ a:hover {
 // client secret : 41d6f33f6f334a6e996f68a4d12b477c
 let artists = [];
 const res = fetch(
-  "https://api.spotify.com/v1/me/top/artists?limit=5&offset=0",
+  // "https://api.spotify.com/v1/me/top/artists?limit=5&offset=0",
+  "https://api.spotify.com/v1/me/top/tracks?offset=0&limit=5&locale=en-US",
   {
     headers: { 'Authorization': 'Bearer b23e3c8e86e24ae78e4d66d5d7a44e8e' }
   }).then(res => res.json())
