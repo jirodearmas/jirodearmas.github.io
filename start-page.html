@@ -22,11 +22,15 @@ body {
 }
 
 .content {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(2px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
 a,
@@ -41,12 +45,6 @@ a {
 
 a:hover {
     color: #0345c8;
-}
-
-.content {
-    width: 100%;
-    display: flex;
-    max-width: 800px;
 }
 
 .center {
