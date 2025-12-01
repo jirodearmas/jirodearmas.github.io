@@ -1,172 +1,130 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Hi, Jiro! Welcome back.</title>
-        <meta charset="UTF-8">
-        <meta name="author" content="Jiro de Armas">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-body {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: #fff;
-    display: flex;
-    font-family: "Poppins", serif;
-    font-weight: 400;
-    font-style: normal;
-    height: 90vh;
-}
-
-.content {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    max-width: 800px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(4px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-}
-
-a,
-p {
-    font-weight: 400;
-}
-
-a {
-    color: #fff;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #ccc;
-}
-
-.center {
-    justify-content: center;
-    align-items: center;
-}
-
-.col {
-    width: 25%;
-    padding-left: 15px;
-    padding-right: 15px;
-    display: flex;
-    flex-direction: column;
-    padding: 30px;
-}
-
-.col a {
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-}
-
-.col a svg {
-    margin-right: 8px;
-}
-
-.col-title {
-    margin-top: 0;
-    font-weight: 700;
-    font-size: 24px;
-}
-</style>
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Top Artists</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: white; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        h1 { margin-bottom: 20px; }
+        #login-btn { background-color: #1DB954; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; transition: transform 0.2s; }
+        #login-btn:hover { transform: scale(1.05); background-color: #1ed760; }
+        #profile-area { display: none; width: 100%; max-width: 800px; }
+        .artist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; margin-top: 20px; }
+        .artist-card { background: #181818; padding: 15px; border-radius: 8px; text-align: center; transition: background 0.3s; }
+        .artist-card:hover { background: #282828; }
+        .artist-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; box-shadow: 0 4px 60px rgba(0,0,0,.5); }
+        .artist-name { font-weight: bold; display: block; margin-bottom: 5px; color: #fff; text-decoration: none; }
+        .artist-rank { color: #b3b3b3; font-size: 0.9em; }
+        .error { color: #ff5555; background: rgba(255,85,85,0.1); padding: 10px; border-radius: 4px; margin-top: 20px; display: none;}
+    </style>
 </head>
-<body id="body" class="center">
-    <div class="content">
-        <div class="col">
-            
-        </div>
-        
+<body>
+
+    <h1>Spotify Top Artists</h1>
+
+    <!-- Login Button -->
+    <a id="login-btn">Login with Spotify</a>
+
+    <!-- Error Message Display -->
+    <div id="error-msg" class="error"></div>
+
+    <!-- Results Area -->
+    <div id="profile-area">
+        <h2>Your Top Artists</h2>
+        <div id="artist-grid" class="artist-grid"></div>
     </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // 1. Enter your Client ID from the Spotify Dashboard
+        const CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; 
+        
+        // 2. This must match the Redirect URI in your Spotify App Settings EXACTLY
+        // If using VS Code Live Server, it's usually http://127.0.0.1:5500/index.html
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        
+        const SCOPES = 'user-top-read'; // Permission to read top artists
+
+        const loginBtn = document.getElementById('login-btn');
+        const profileArea = document.getElementById('profile-area');
+        const artistGrid = document.getElementById('artist-grid');
+        const errorMsg = document.getElementById('error-msg');
+
+        // --- STEP 1: HANDLE LOGIN REDIRECT ---
+        loginBtn.addEventListener('click', () => {
+            // We use the "Implicit Grant" flow for client-side simplicity
+            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}&response_type=token&show_dialog=true`;
+            window.location.href = authUrl;
+        });
+
+        // --- STEP 2: PARSE TOKEN FROM URL ---
+        // When Spotify redirects back, the token is in the URL hash (e.g., #access_token=...)
+        const hash = window.location.hash.substring(1).split('&').reduce((initial, item) => {
+            if (item) {
+                var parts = item.split('=');
+                initial[parts[0]] = decodeURIComponent(parts[1]);
+            }
+            return initial;
+        }, {});
+
+        // Clear the ugly hash from the URL bar for a cleaner look
+        window.location.hash = '';
+
+        // --- STEP 3: USE TOKEN TO FETCH DATA ---
+        if (hash.access_token) {
+            // Hide login, show profile
+            loginBtn.style.display = 'none';
+            profileArea.style.display = 'block';
+
+            fetchTopArtists(hash.access_token);
+        }
+
+        async function fetchTopArtists(token) {
+            try {
+                // Fetch the data
+                const response = await fetch('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=10', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data. Token might be expired.');
+                }
+
+                const data = await response.json();
+                displayArtists(data.items);
+
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function displayArtists(artists) {
+            artistGrid.innerHTML = ''; // Clear previous results
+            
+            artists.forEach((artist, index) => {
+                const card = document.createElement('div');
+                card.className = 'artist-card';
+                
+                // Handle cases where artist might not have an image
+                const imageUrl = artist.images[0] ? artist.images[0].url : 'https://via.placeholder.com/150';
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${artist.name}" class="artist-img">
+                    <a href="${artist.external_urls.spotify}" target="_blank" class="artist-name">${index + 1}. ${artist.name}</a>
+                    <div class="artist-rank">Popularity: ${artist.popularity}%</div>
+                `;
+                artistGrid.appendChild(card);
+            });
+        }
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = 'block';
+            loginBtn.style.display = 'inline-block'; // Allow retry
+        }
+    </script>
 </body>
-<script>
-let clientId = 'b23e3c8e86e24ae78e4d66d5d7a44e8e';
-let clientSecret = '41d6f33f6f334a6e996f68a4d12b477c';
-
-const getToken = async code => {
-
-  // stored in the previous step
-  const codeVerifier = localStorage.getItem('code_verifier');
-
-  const url = "https://accounts.spotify.com/api/token";
-  const payload = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: redirectUri,
-      code_verifier: codeVerifier,
-    }),
-  }
-
-  const body = await fetch(url, payload);
-  const response = await body.json();
-
-  localStorage.setItem('access_token', response.access_token);
-}
-
-
-async function getProfile(accessToken) {
-  let accessToken = localStorage.getItem('access_token');
-
-  const response = await fetch('https://api.spotify.com/v1/me', {
-    headers: {
-      Authorization: 'Bearer ' + accessToken
-    }
-  });
-
-  const data = await response.json();
-}
-
-
-// async function getUserTopArtists(accessToken) {
-//   const url = 'https://api.spotify.com/v1/me/top/artists';
-
-//   try {
-//     const response = fetch(url, {
-//       method: 'GET',
-//       headers: {
-//         'Authorization': `Bearer ${accessToken}`,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-
-//     const data = response.json();
-//     return data.items; // This will contain an array of top artist objects
-//   } catch (error) {
-//     console.error('Error fetching top artists:', error);
-//     return [];
-//   }
-// }
-
-// const accessToken = client_id; 
-// getUserTopArtists(accessToken)
-//   .then(artists => {
-//     if (artists.length > 0) {
-//       console.log('User\'s Top Artists:');
-//       artists.forEach(artist => {
-//         console.log(`- ${artist.name} (Popularity: ${artist.popularity})`);
-//       });
-//     } else {
-//       console.log('No top artists found or error occurred.');
-//     }
-//   });
-
-</script>
 </html>
