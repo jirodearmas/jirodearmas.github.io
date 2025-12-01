@@ -16,50 +16,73 @@
         .artist-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; box-shadow: 0 4px 60px rgba(0,0,0,.5); }
         .artist-name { font-weight: bold; display: block; margin-bottom: 5px; color: #fff; text-decoration: none; }
         .artist-rank { color: #b3b3b3; font-size: 0.9em; }
-        .error { color: #ff5555; background: rgba(255,85,85,0.1); padding: 10px; border-radius: 4px; margin-top: 20px; display: none;}
+        .error { color: #ff5555; background: rgba(255,85,85,0.1); padding: 10px; border-radius: 4px; margin-top: 20px; display: block; font-size: 0.9em;}
+        #uri-check { margin-top: 10px; padding: 10px; border: 1px dashed #404040; border-radius: 4px; font-size: 0.8em; }
     </style>
 </head>
 <body>
 
     <h1>Spotify Top Artists</h1>
 
+    <!-- Debugging Helper -->
+    <div id="uri-check">
+        <p>1. **Current Browser URL:** <code id="current-uri">...</code></p>
+        <p>2. **Your Code's REDIRECT_URI:** <code id="config-uri">...</code></p>
+        <p style="color: yellow; font-weight: bold;">These two lines MUST match the Redirect URI in your Spotify Dashboard.</p>
+    </div>
+
     <!-- Login Button -->
     <a id="login-btn">Login with Spotify</a>
 
     <!-- Error Message Display -->
-    <div id="error-msg" class="error"></div>
+    <div id="error-msg" class="error" style="display: none;"></div>
 
     <!-- Results Area -->
     <div id="profile-area">
-        <h2>Your Top Artists</h2>
+        <h2>Your Top Artists (Medium Term)</h2>
         <div id="artist-grid" class="artist-grid"></div>
     </div>
 
     <script>
         // --- CONFIGURATION ---
         // 1. Enter your Client ID from the Spotify Dashboard
-        const CLIENT_ID = 'b23e3c8e86e24ae78e4d66d5d7a44e8e'; 
+        const CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; 
         
-        // 2. This must match the Redirect URI in your Spotify App Settings EXACTLY
-        // If using VS Code Live Server, it's usually http://127.0.0.1:5500/index.html
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
-        
-        const SCOPES = 'user-top-read'; // Permission to read top artists
+        // 2. *CRITICAL*: Set this to the EXACT URI registered in your Spotify App Settings.
+        // E.g., 'http://127.0.0.1:5500/index.html'
+        // If left empty, it tries to auto-detect, but explicit is better for debugging.
+        const EXPLICIT_REDIRECT_URI = ''; // Set this to the exact registered URI!
 
+        // Determine the actual redirect URI to use
+        const REDIRECT_URI = EXPLICIT_REDIRECT_URI || window.location.href.split('#')[0];
+        
+        const SCOPES = 'user-top-read';
+        
+        // --- DOM ELEMENTS ---
         const loginBtn = document.getElementById('login-btn');
         const profileArea = document.getElementById('profile-area');
         const artistGrid = document.getElementById('artist-grid');
         const errorMsg = document.getElementById('error-msg');
+        const currentUriDisplay = document.getElementById('current-uri');
+        const configUriDisplay = document.getElementById('config-uri');
 
+        // Display current URIs for easy comparison
+        currentUriDisplay.textContent = window.location.href.split('#')[0];
+        configUriDisplay.textContent = REDIRECT_URI;
+        
         // --- STEP 1: HANDLE LOGIN REDIRECT ---
         loginBtn.addEventListener('click', () => {
-            // We use the "Implicit Grant" flow for client-side simplicity
+            // Check if the developer has set the CLIENT_ID
+            if (CLIENT_ID === 'YOUR_CLIENT_ID_HERE') {
+                showError("Please replace 'YOUR_CLIENT_ID_HERE' with your actual Spotify Client ID in the script.");
+                return;
+            }
+
             const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}&response_type=token&show_dialog=true`;
             window.location.href = authUrl;
         });
 
         // --- STEP 2: PARSE TOKEN FROM URL ---
-        // When Spotify redirects back, the token is in the URL hash (e.g., #access_token=...)
         const hash = window.location.hash.substring(1).split('&').reduce((initial, item) => {
             if (item) {
                 var parts = item.split('=');
@@ -68,17 +91,25 @@
             return initial;
         }, {});
 
-        // Clear the ugly hash from the URL bar for a cleaner look
-        window.location.hash = '';
+        // Clear the ugly hash from the URL bar
+        if (window.location.hash) {
+            window.location.hash = '';
+        }
 
         // --- STEP 3: USE TOKEN TO FETCH DATA ---
         if (hash.access_token) {
-            // Hide login, show profile
             loginBtn.style.display = 'none';
+            document.getElementById('uri-check').style.display = 'none';
             profileArea.style.display = 'block';
 
             fetchTopArtists(hash.access_token);
+        } else if (window.location.search.includes('error=')) {
+            // Handle errors returned via query parameters (e.g., user denied access)
+            const params = new URLSearchParams(window.location.search);
+            const error = params.get('error');
+            showError(`Authorization failed. Error: ${error}. Please try logging in again.`);
         }
+
 
         async function fetchTopArtists(token) {
             try {
@@ -89,8 +120,12 @@
                     }
                 });
 
+                if (response.status === 401) {
+                    throw new Error('Unauthorized. Access token expired or invalid.');
+                }
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data. Token might be expired.');
+                    const errorDetails = await response.json();
+                    throw new Error(`Spotify API Error: ${errorDetails.error.message || response.statusText}`);
                 }
 
                 const data = await response.json();
@@ -98,18 +133,24 @@
 
             } catch (err) {
                 showError(err.message);
+                loginBtn.style.display = 'inline-block';
             }
         }
 
         function displayArtists(artists) {
-            artistGrid.innerHTML = ''; // Clear previous results
+            artistGrid.innerHTML = ''; 
             
+            if (artists.length === 0) {
+                artistGrid.innerHTML = '<p class="error" style="color: #ffffff; background: none;">No top artists found for the selected time range.</p>';
+                return;
+            }
+
             artists.forEach((artist, index) => {
                 const card = document.createElement('div');
                 card.className = 'artist-card';
                 
-                // Handle cases where artist might not have an image
-                const imageUrl = artist.images[0] ? artist.images[0].url : 'https://via.placeholder.com/150';
+                // Fallback placeholder image 
+                const imageUrl = artist.images[0] ? artist.images[0].url : 'https://placehold.co/120x120/1DB954/ffffff?text=No+Image';
 
                 card.innerHTML = `
                     <img src="${imageUrl}" alt="${artist.name}" class="artist-img">
@@ -121,9 +162,11 @@
         }
 
         function showError(msg) {
-            errorMsg.innerText = msg;
+            errorMsg.innerText = "🚨 Error: " + msg;
             errorMsg.style.display = 'block';
-            loginBtn.style.display = 'inline-block'; // Allow retry
+            // Show debugging helper again if there's an issue
+            document.getElementById('uri-check').style.display = 'block'; 
+            loginBtn.style.display = 'inline-block'; 
         }
     </script>
 </body>
