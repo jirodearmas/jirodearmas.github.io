@@ -88,8 +88,8 @@ a:hover {
     </div>
 </body>
 <script>
-// client id : b23e3c8e86e24ae78e4d66d5d7a44e8e
-// client secret : 41d6f33f6f334a6e996f68a4d12b477c
+let client_id = 'b23e3c8e86e24ae78e4d66d5d7a44e8e';
+let client_secret = '41d6f33f6f334a6e996f68a4d12b477c';
 
 async function getUserTopArtists(accessToken) {
   const url = 'https://api.spotify.com/v1/me/top/artists';
@@ -116,7 +116,7 @@ async function getUserTopArtists(accessToken) {
 }
 
 // Example usage (replace 'YOUR_ACCESS_TOKEN' with an actual token)
-const accessToken = 'b23e3c8e86e24ae78e4d66d5d7a44e8e'; 
+const accessToken = client_secret; 
 getUserTopArtists(accessToken)
   .then(artists => {
     if (artists.length > 0) {
