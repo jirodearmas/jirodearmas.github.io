@@ -145,9 +145,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </body>
 <script>
+const keywords = ["Nature", "Landscape", "Mountain", "Ocean", "Space", "Beach", "Flowers", "Animals", "Banff", "Canada", "Philippines"];
+function getRandomKeyword(arr) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    return arr[randomIndex];
+}
+const keyword = getRandomKeyword(keywords);
+
 let images = [];
 const res = fetch(
-  "https://api.pexels.com/v1/search?query=Nature&orientation=landscape&size=large&per_page=1",
+  "https://api.pexels.com/v1/search?query="+ keyword +"&orientation=landscape&size=large&per_page=1",
   {
     headers: { 'Authorization': 'qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih' }
   }).then(res => res.json())
