@@ -142,6 +142,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </body>
 <script>
+exports.handler = async function (event, context) {
+  const value = process.env.PEXELS_KEY;
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: `Value of PEXELS_KEY is ${value}.` }),
+  };
+};
+
 const keywords = ["Nature", "Landscape", "Mountain", "Ocean", "Space", "Beach", "Flowers", "Animals", "Banff", "Canada", "Philippines"];
 function getRandomKeyword(arr) {
     const randomIndex = Math.floor(Math.random() * arr.length);
