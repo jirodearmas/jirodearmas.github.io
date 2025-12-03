@@ -142,14 +142,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </body>
 <script>
-exports.handler = async function (event, context) {
-  const value = process.env.PEXELS_KEY;
+// exports.handler = async function (event, context) {
+//   const value = process.env.PEXELS_KEY;
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: `Value of PEXELS_KEY is ${value}.` }),
-  };
-};
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify({ message: `Value of PEXELS_KEY is ${value}.` }),
+//   };
+// };
 
 const keywords = ["Nature", "Landscape", "Mountain", "Ocean", "Space", "Beach", "Flowers", "Animals", "Banff", "Canada", "Philippines"];
 function getRandomKeyword(arr) {
@@ -162,7 +162,7 @@ let images = [];
 const res = fetch(
   "https://api.pexels.com/v1/search?query="+ keyword +"&orientation=landscape&size=large&per_page=1",
   {
-    headers: { 'Authorization': process.env.PEXELS_KEY }
+    headers: { 'Authorization': 'qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih' }
   }).then(res => res.json())
   .then(json => {
     images = json['photos'][0]['src']['original']
