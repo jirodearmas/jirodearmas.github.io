@@ -153,7 +153,7 @@ let images = [];
 const res = fetch(
   "https://api.pexels.com/v1/search?query="+ keyword +"&orientation=landscape&size=large&per_page=1",
   {
-    headers: { 'Authorization': 'qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih' }
+    headers: { 'Authorization': process.env.PEXELS_KEY }
   }).then(res => res.json())
   .then(json => {
     images = json['photos'][0]['src']['original']
