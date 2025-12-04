@@ -160,12 +160,12 @@ const keyword = getRandomKeyword(keywords);
 
 let images = [];
 const res = fetch(
-  "https://api.pexels.com/v1/search?query="+ keyword +"&orientation=landscape&size=large&per_page=1",
+  "https://api.pexels.com/v1/search?query="+ keyword +"&orientation=landscape&size=large&per_page=25",
   {
     headers: { 'Authorization': 'qK9Uh9YZ9QhdoGIzRbTCujlxtrefqeY5mQuGsaNsFpw29koAMLmYO4ih' }
   }).then(res => res.json())
   .then(json => {
-    images = json['photos'][0]['src']['original']
+    images = json['photos'][Math.floor(Math.random() * 25)]['src']['original']
     const html_body = document.getElementById('body');
 html_body.style.backgroundImage = 'url('+ images +')';
   });
