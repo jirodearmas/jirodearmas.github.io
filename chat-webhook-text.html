@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webhook Test - Locate Chat</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+    
+    .status.success {
+      display: block;
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .status.loading {
+      display: block;
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📨 Send to Locate Chat</h1>
+    <p class="subtitle">Test webhook message delivery</p>
+    
+    <form id="webhookForm">
+      <div class="form-group">
+        <label for="username">Display Name</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="e.g., GitHub Bot"
+          required
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea 
+          id="message" 
+          name="message" 
+          placeholder="Enter your message here..."
+          required
+        ></textarea>
+      </div>
+      
+      <button type="submit" id="submitBtn">Send Message</button>
+    </form>
+    
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    // Change this to your webhook URL
+    // For local testing: http://localhost:3001/api/webhooks/YOUR_TOKEN
+    // For production: https://chat.locatetech.nz/api/webhooks/YOUR_TOKEN
+    const WEBHOOK_URL = 'http://localhost:3001/api/webhooks/8634c99f9ca046c1b9b3040e2b3e19f1995902966c09470bbda7d037af388088';
+    
+    const form = document.getElementById('webhookForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusDiv = document.getElementById('status');
+    
+    function showStatus(type, message) {
+      statusDiv.className = 'status ' + type;
+      statusDiv.textContent = message;
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const content = document.getElementById('message').value.trim();
+      
+      if (!username || !content) {
+        showStatus('error', 'Please fill in all fields');
+        return;
+      }
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      showStatus('loading', 'Sending message...');
+      
+      try {
+        console.log('Sending to:', WEBHOOK_URL);
+        console.log('Payload:', { content, username });
+        
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors',
+          body: JSON.stringify({
+            content: content,
+            username: username
+          })
+        });
+        
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (response.ok && data.success) {
+          showStatus('success', '✓ Message sent successfully!');
+          document.getElementById('message').value = '';
+        } else {
+          showStatus('error', '✗ Error: ' + (data.error || 'Failed to send'));
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showStatus('error', '✗ Network error: ' + error.message + ' (Check browser console for details)');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+      }
+    });
+  </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8e3fda5446d64890bcab655af01db7f3","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
